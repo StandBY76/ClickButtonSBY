@@ -40,6 +40,7 @@ class TouchButton
 {
   public:
     TouchButton(uint8_t buttonPin, uint8_t thresholdValue);
+    TouchButton(uint8_t buttonPin, uint8_t thresholdValueHigh, uint8_t thresholdValueLow);
     void Update();
     int clicks;                   // button click counts to return
     boolean depressed;            // the currently debounced button (press) state (presumably it is not sad :)
