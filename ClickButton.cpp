@@ -1,41 +1,41 @@
 /*    ClickButton
- 
+
  Arduino library that decodes multiple clicks on one button.
  Also copes with long clicks and click-and-hold.
- 
+
  Usage: ClickButton buttonObject(pin [LOW/HIGH, [CLICKBTN_PULLUP]]);
- 
+
   where LOW/HIGH denotes active LOW or HIGH button (default is LOW)
   CLICKBTN_PULLUP is only possible with active low buttons.
- 
+
 
  Returned click counts:
 
    A positive number denotes the number of (short) clicks after a released button
    A negative number denotes the number of "long" clicks
- 
+
 NOTE!
  This is the OPPOSITE/negative of click codes from the last pre-2013 versions!
  (this seemed more logical and simpler, so I finally changed it)
 
  Based on the Debounce example at arduino playground site
 
- 
+
  Copyright (C) 2010,2012, 2013 raron
 
-  
+
  GNU GPLv3 license
- 
+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -43,8 +43,9 @@ NOTE!
 
  Contact: raronzen@gmail.com
 
- 
+
  History:
+ 2022.03.21 - time for hold button added
  2022.02.23 - Touch pin button for ESP32 added
  2013.08.29 - Some small clean-up of code, more sensible variable names etc.
                 Added another example code for multiple buttons in an object array
@@ -118,7 +119,7 @@ ClickButton::ClickButton(uint8_t buttonPin, boolean activeType, boolean internal
   //pinMode(_pin, INPUT);
   // Turn on internal pullup resistor if applicable
   //if (_activeHigh == LOW && internalPullup == CLICKBTN_PULLUP) digitalWrite(_pin,HIGH);
-  if (_activeHigh == LOW && internalPullup == CLICKBTN_PULLUP) 
+  if (_activeHigh == LOW && internalPullup == CLICKBTN_PULLUP)
     pinMode(_pin, INPUT_PULLUP);
   else
     pinMode(_pin, INPUT);
@@ -129,6 +130,9 @@ ClickButton::ClickButton(uint8_t buttonPin, boolean activeType, boolean internal
 void ClickButton::Update()
 {
   long now = (long)millis();      // get current time
+  holdTime = (_longStartTime > 0) ? (now - _longStartTime) : 0;
+  isHold = (_longStartTime > 0) ? true : false;
+
   _btnState = digitalRead(_pin);  // current appearant button state
 
   // Make the button logic active-high in code
@@ -136,7 +140,6 @@ void ClickButton::Update()
 
   // If the switch changed, due to noise or a button press, reset the debounce timer
   if (_btnState != _lastState) _lastBounceTime = now;
-
 
   // debounce the button (Check if a stable, changed state has occured)
   if (now - _lastBounceTime > debounceTime && _btnState != depressed)
@@ -154,6 +157,7 @@ void ClickButton::Update()
     // positive count for released buttons
     clicks = _clickCount;
     _clickCount = 0;
+    _longStartTime = 0;
     if(clicks != 0) changed = true;
   }
 
@@ -163,10 +167,12 @@ void ClickButton::Update()
     // negative count for long clicks
     clicks = 0 - _clickCount;
     _clickCount = 0;
-    if(clicks != 0) changed = true;
+    if(clicks != 0) {
+      _longStartTime = now - longClickTime;
+      changed = true;
+    }
   }
 }
-
 
 
 
@@ -217,6 +223,8 @@ TouchButton::TouchButton(uint8_t buttonPin, uint8_t thresholdValueHigh, uint8_t 
 void TouchButton::Update()
 {
   long now = (long)millis();      // get current time
+  holdTime = (_longStartTime > 0) ? (now - _longStartTime) : 0;
+  isHold = (_longStartTime > 0) ? true : false;
 
 #if defined(ESP32)
   int touchValue = touchRead(_pin);                               // read touch pin value
@@ -236,7 +244,6 @@ void TouchButton::Update()
   // If the switch changed, due to noise or a button press, reset the debounce timer
   if (_btnState != _lastState) _lastBounceTime = now;
 
-
   // debounce the button (Check if a stable, changed state has occured)
   if (now - _lastBounceTime > debounceTime && _btnState != depressed)
   {
@@ -253,6 +260,7 @@ void TouchButton::Update()
     // positive count for released buttons
     clicks = _clickCount;
     _clickCount = 0;
+    _longStartTime = 0;
     if(clicks != 0) changed = true;
   }
 
@@ -262,7 +270,9 @@ void TouchButton::Update()
     // negative count for long clicks
     clicks = 0 - _clickCount;
     _clickCount = 0;
-    if(clicks != 0) changed = true;
+    if(clicks != 0) {
+      _longStartTime = now - longClickTime;
+      changed = true;
+    }
   }
 }
-

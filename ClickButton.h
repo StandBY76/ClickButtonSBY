@@ -25,6 +25,7 @@ class ClickButton
     long longClickTime;
     boolean changed;
     long holdTime;                // How long has the button been held
+    boolean isHold;
   private:
     uint8_t _pin;                 // Arduino pin connected to the button
     boolean _activeHigh;          // Type of button: Active-low = 0 or active-high = 1
@@ -49,6 +50,7 @@ class TouchButton
     long longClickTime;
     boolean changed;
     long holdTime;                // How long has the button been held
+    boolean isHold;
     int thresholdHigh;            // high threshold for touch button
     int thresholdLow;             // low threshold for touch button
   private:
@@ -63,4 +65,3 @@ class TouchButton
 
 
 #endif
-

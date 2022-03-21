@@ -25,7 +25,7 @@ CLICKBTN_PULLUP	LITERAL1
 # Built in variables (LITERAL2)
 #######################################
 
-clicks	LITERAL2
+clicks	        LITERAL2
 depressed	LITERAL2
 maxPresses	LITERAL2
 debounceTime	LITERAL2
@@ -33,4 +33,5 @@ multiclickTime	LITERAL2
 longClickTime	LITERAL2
 changed 	LITERAL2
 threshold       LITERAL2
-
+holdTime        LITERAL2
+isHold          LITERAL2
