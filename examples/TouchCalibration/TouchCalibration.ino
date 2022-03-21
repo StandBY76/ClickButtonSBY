@@ -4,6 +4,8 @@
 
 int minimum = 255;
 int maximum = 0;
+int debounce = 0;
+int avgValue = 0;
 
 int touchValue;
 
@@ -24,7 +26,7 @@ void loop() {
   touchValue = touchRead(touch_pin);
   if (touchValue > maximum) maximum = touchValue;
   if (touchValue < minimum) minimum = touchValue;
-  
+
   Serial.print(touchValue);       // Start serial plotter
   Serial.print("\t");
   Serial.print(minimum);
