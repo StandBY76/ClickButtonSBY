@@ -76,6 +76,7 @@ ClickButton::ClickButton(uint8_t buttonPin)
   longClickTime  = 1000;          // time until long clicks register
   changed        = false;
   holdTime       = 0;
+  isHold         = false;
   pinMode(_pin, INPUT);
 }
 
@@ -96,6 +97,7 @@ ClickButton::ClickButton(uint8_t buttonPin, boolean activeType)
   longClickTime  = 1000;          // time until long clicks register
   changed        = false;
   holdTime       = 0;
+  isHold         = false;
   pinMode(_pin, INPUT);
 }
 
@@ -116,6 +118,7 @@ ClickButton::ClickButton(uint8_t buttonPin, boolean activeType, boolean internal
   longClickTime  = 1000;          // time until "long" click register
   changed        = false;
   holdTime       = 0;
+  isHold         = false;
   //pinMode(_pin, INPUT);
   // Turn on internal pullup resistor if applicable
   //if (_activeHigh == LOW && internalPullup == CLICKBTN_PULLUP) digitalWrite(_pin,HIGH);
@@ -130,8 +133,7 @@ ClickButton::ClickButton(uint8_t buttonPin, boolean activeType, boolean internal
 void ClickButton::Update()
 {
   long now = (long)millis();      // get current time
-  holdTime = (_longStartTime > 0) ? (now - _longStartTime) : 0;
-  isHold = (_longStartTime > 0) ? true : false;
+  holdTime = isHold ? (now - _longStartTime) : 0;
 
   _btnState = digitalRead(_pin);  // current appearant button state
 
@@ -158,6 +160,7 @@ void ClickButton::Update()
     clicks = _clickCount;
     _clickCount = 0;
     _longStartTime = 0;
+    isHold = false;
     if(clicks != 0) changed = true;
   }
 
@@ -169,6 +172,7 @@ void ClickButton::Update()
     _clickCount = 0;
     if(clicks != 0) {
       _longStartTime = now - longClickTime;
+      isHold = true;
       changed = true;
     }
   }
@@ -192,6 +196,7 @@ TouchButton::TouchButton(uint8_t buttonPin, uint8_t thresholdValue)
   longClickTime  = 500;           // time until long clicks register
   changed        = false;
   holdTime       = 0;
+  isHold         = false;
   thresholdHigh  = thresholdValue;
   thresholdLow   = 0;
 }
@@ -213,6 +218,7 @@ TouchButton::TouchButton(uint8_t buttonPin, uint8_t thresholdValueHigh, uint8_t 
   longClickTime  = 500;           // time until long clicks register
   changed        = false;
   holdTime       = 0;
+  isHold         = false;
   thresholdHigh  = thresholdValueHigh;
   thresholdLow   = thresholdValueLow;
 }
@@ -223,8 +229,7 @@ TouchButton::TouchButton(uint8_t buttonPin, uint8_t thresholdValueHigh, uint8_t 
 void TouchButton::Update()
 {
   long now = (long)millis();      // get current time
-  holdTime = (_longStartTime > 0) ? (now - _longStartTime) : 0;
-  isHold = (_longStartTime > 0) ? true : false;
+  holdTime = isHold ? (now - _longStartTime) : 0;
 
 #if defined(ESP32)
   int touchValue = touchRead(_pin);                               // read touch pin value
@@ -261,6 +266,7 @@ void TouchButton::Update()
     clicks = _clickCount;
     _clickCount = 0;
     _longStartTime = 0;
+    isHold = false;
     if(clicks != 0) changed = true;
   }
 
@@ -272,6 +278,7 @@ void TouchButton::Update()
     _clickCount = 0;
     if(clicks != 0) {
       _longStartTime = now - longClickTime;
+      isHold = true;
       changed = true;
     }
   }
