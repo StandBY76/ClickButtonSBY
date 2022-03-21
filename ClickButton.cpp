@@ -172,6 +172,7 @@ void ClickButton::Update()
     _clickCount = 0;
     if(clicks != 0) {
       _longStartTime = now - longClickTime;
+      holdTime = longClickTime;
       isHold = true;
       changed = true;
     }
@@ -278,6 +279,7 @@ void TouchButton::Update()
     _clickCount = 0;
     if(clicks != 0) {
       _longStartTime = now - longClickTime;
+      holdTime = longClickTime;
       isHold = true;
       changed = true;
     }
