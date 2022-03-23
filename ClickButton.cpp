@@ -161,6 +161,7 @@ void ClickButton::Update()
     clicks = _clickCount;
     _clickCount = 0;
     _longStartTime = 0;                        // reset timer (probably not needed) - just in case
+    holdTime = 0;
     isHold = false;                            // button is no more held
     if(clicks != 0) changed = true;
   }
@@ -269,6 +270,7 @@ void TouchButton::Update()
     clicks = _clickCount;
     _clickCount = 0;
     _longStartTime = 0;                        // reset timer (probably not needed) - just in case
+    holdTime = 0;
     isHold = false;                            // button is no more held
     if(clicks != 0) changed = true;
   }
