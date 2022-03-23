@@ -130,10 +130,11 @@ ClickButton::ClickButton(uint8_t buttonPin, boolean activeType, boolean internal
 }
 
 
+
 void ClickButton::Update()
 {
   long now = (long)millis();      // get current time
-  holdTime = isHold ? (now - _longStartTime) : 0;
+  holdTime = isHold ? (now - _longStartTime) : 0;                 // time of the button holding
 
   _btnState = digitalRead(_pin);  // current appearant button state
 
@@ -159,8 +160,8 @@ void ClickButton::Update()
     // positive count for released buttons
     clicks = _clickCount;
     _clickCount = 0;
-    _longStartTime = 0;
-    isHold = false;
+    _longStartTime = 0;                        // reset timer (probably not needed) - just in case
+    isHold = false;                            // button is no more held
     if(clicks != 0) changed = true;
   }
 
@@ -170,10 +171,11 @@ void ClickButton::Update()
     // negative count for long clicks
     clicks = 0 - _clickCount;
     _clickCount = 0;
-    if(clicks != 0) {
-      _longStartTime = now - longClickTime;
-      holdTime = longClickTime;
-      isHold = true;
+//    if(clicks != 0) {
+    if(!isHold) {
+      _longStartTime = now - longClickTime;     // when long click time started
+      holdTime = longClickTime;                 // long click time is hold time on the start
+      isHold = true;                            // holding the button is going
       changed = true;
     }
   }
@@ -194,7 +196,7 @@ TouchButton::TouchButton(uint8_t buttonPin, uint8_t thresholdValue)
   _longStartTime = 0;
   debounceTime   = 20;            // Debounce timer in ms
   multiclickTime = 250;           // Time limit for multi clicks
-  longClickTime  = 500;           // time until long clicks register
+  longClickTime  = 1000;           // time until long clicks register
   changed        = false;
   holdTime       = 0;
   isHold         = false;
@@ -216,7 +218,7 @@ TouchButton::TouchButton(uint8_t buttonPin, uint8_t thresholdValueHigh, uint8_t 
   _longStartTime = 0;
   debounceTime   = 20;            // Debounce timer in ms
   multiclickTime = 250;           // Time limit for multi clicks
-  longClickTime  = 500;           // time until long clicks register
+  longClickTime  = 1000;           // time until long clicks register
   changed        = false;
   holdTime       = 0;
   isHold         = false;
@@ -230,7 +232,7 @@ TouchButton::TouchButton(uint8_t buttonPin, uint8_t thresholdValueHigh, uint8_t 
 void TouchButton::Update()
 {
   long now = (long)millis();      // get current time
-  holdTime = isHold ? (now - _longStartTime) : 0;
+  holdTime = isHold ? (now - _longStartTime) : 0;                 // time of the button holding
 
 #if defined(ESP32)
   int touchValue = touchRead(_pin);                               // read touch pin value
@@ -266,8 +268,8 @@ void TouchButton::Update()
     // positive count for released buttons
     clicks = _clickCount;
     _clickCount = 0;
-    _longStartTime = 0;
-    isHold = false;
+    _longStartTime = 0;                        // reset timer (probably not needed) - just in case
+    isHold = false;                            // button is no more held
     if(clicks != 0) changed = true;
   }
 
@@ -277,10 +279,11 @@ void TouchButton::Update()
     // negative count for long clicks
     clicks = 0 - _clickCount;
     _clickCount = 0;
-    if(clicks != 0) {
-      _longStartTime = now - longClickTime;
-      holdTime = longClickTime;
-      isHold = true;
+//    if(clicks != 0) {
+    if(!isHold) {
+      _longStartTime = now - longClickTime;     // when long click time started
+      holdTime = longClickTime;                 // long click time is hold time on the start
+      isHold = true;                            // holding the button is going
       changed = true;
     }
   }
