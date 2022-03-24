@@ -35,5 +35,3 @@ changed 	LITERAL2
 threshold       LITERAL2
 holdTime        LITERAL2
 isHold          LITERAL2
-
-
